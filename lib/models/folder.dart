@@ -36,4 +36,9 @@ class Folder {
       timestamp: timestamp ?? this.timestamp,
     );
   }
+
+  @override
+  String toString() {
+    return 'Folder{id: $id, folderName: $folderName, timestamp: $timestamp}';
+  }
 }

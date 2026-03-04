@@ -48,4 +48,9 @@ class PlayingCard {
       folderId: folderId ?? this.folderId,
     );
   }
+
+  @override
+  String toString() {
+    return 'PlayingCard{id: $id, cardName: $cardName, suit: $suit, folderId: $folderId}';
+  }
 }
