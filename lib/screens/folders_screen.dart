@@ -102,6 +102,7 @@ Color _getSuitColor(String suitName) {
                       builder: (_) => CardsScreen(folder: folder),
                     ),
                   );
+                  // Refresh Folders on Return
                   _loadFolders();
                 },
                 child: Column(
