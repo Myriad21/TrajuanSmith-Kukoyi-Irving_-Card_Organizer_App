@@ -127,7 +127,7 @@ Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
         await db.insert('cards', {
           'card_name': card,
           'suit': suits[folderId - 1],
-          'image_url': 'assets/cards/${suits[folderId - 1].toLowerCase()}_$card.png',
+          'image_url': 'assets/cards/${suits[folderId - 1].toLowerCase()}_${card.toLowerCase()}.png',
           'folder_id': folderId,
         });
       }

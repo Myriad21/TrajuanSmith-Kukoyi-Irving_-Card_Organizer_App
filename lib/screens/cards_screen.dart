@@ -48,7 +48,12 @@ class _CardsScreenState extends State<CardsScreen> {
                 final card = _cards[index];
 
                 return ListTile(
-                  leading: const Icon(Icons.style),
+                  leading: Image.asset(
+                  card.imageUrl ?? '',
+                  width: 40,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
                   title: Text(card.cardName),
                   subtitle: Text(card.suit),
                 );
