@@ -40,22 +40,87 @@ class _FoldersScreenState extends State<FoldersScreen> {
     });
   }
 
+String _getSuitSymbol(String suitName) {
+  switch (suitName) {
+    case 'Hearts':
+      return '♥';
+    case 'Diamonds':
+      return '♦';
+    case 'Clubs':
+      return '♣';
+    case 'Spades':
+      return '♠';
+    default:
+      return '?';
+  }
+}
+
+Color _getSuitColor(String suitName) {
+  switch (suitName) {
+    case 'Hearts':
+    case 'Diamonds':
+      return Colors.red;
+    case 'Clubs':
+    case 'Spades':
+      return Colors.black;
+    default:
+      return Colors.grey;
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Card Organizer')),
       body: 
           _loading ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-            itemCount: _folders.length,
-            itemBuilder: (context, index) {
-              final folder = _folders[index];
-              return ListTile(
-                title: Text(folder.folderName),
-                subtitle: Text('${_cardCounts[folder.id!] ?? 0} cards'),
-              );
-            },
-          )
+          : GridView.builder(
+          padding: const EdgeInsets.all(16),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 1.2,
+          ),
+          itemCount: _folders.length,
+          itemBuilder: (context, index) {
+            final folder = _folders[index];
+            final count = _cardCounts[folder.id!] ?? 0;
+
+            return Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _getSuitSymbol(folder.folderName),
+                    style: TextStyle(
+                      fontSize: 64,
+                      fontWeight: FontWeight.w900,
+                      color: _getSuitColor(folder.folderName),
+                      height: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    folder.folderName,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '$count cards',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            );
+          },
+      ),
     );
   }
 }
