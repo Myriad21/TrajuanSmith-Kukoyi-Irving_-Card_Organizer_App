@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/folder.dart';
 import '../repositories/folder_repository.dart';
 import '../repositories/card_repository.dart';
+import '../screens/cards_screen.dart';
 
 class FoldersScreen extends StatefulWidget {
   const FoldersScreen({super.key});
@@ -92,31 +93,37 @@ Color _getSuitColor(String suitName) {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _getSuitSymbol(folder.folderName),
-                    style: TextStyle(
-                      fontSize: 64,
-                      fontWeight: FontWeight.w900,
-                      color: _getSuitColor(folder.folderName),
-                      height: 1,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CardsScreen(folder: folder),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    folder.folderName,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  );
+                  _loadFolders();
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _getSuitSymbol(folder.folderName),
+                      style: TextStyle(
+                        fontSize: 64,
+                        fontWeight: FontWeight.w900,
+                        color: _getSuitColor(folder.folderName),
+                        height: 1,
+                      ),
                     ),
-                  ),
-                  Text(
-                    '$count cards',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text(
+                      folder.folderName,
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    Text('$count cards', style: TextStyle(color: Colors.grey[600])),
+                  ],
+                ),
               ),
             );
           },
