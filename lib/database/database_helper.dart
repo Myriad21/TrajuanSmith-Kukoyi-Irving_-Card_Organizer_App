@@ -18,10 +18,11 @@ class DatabaseHelper {
     final path = join(dbPath, filePath);
 
     return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _createDB,
-    );
+  path,
+  version: 2,
+  onCreate: _createDB,
+  onUpgrade: _upgradeDB,
+);
   }
 
   Future _createDB(Database db, int version) async {
@@ -51,6 +52,58 @@ class DatabaseHelper {
     await _prepopulateFolders(db);
     await _prepopulateCards(db);
   }
+
+Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+  await db.execute('PRAGMA foreign_keys = ON');
+
+  // Ensures tables exist
+  await db.execute('''
+    CREATE TABLE IF NOT EXISTS folders(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      folder_name TEXT NOT NULL,
+      timestamp TEXT NOT NULL
+    )
+  ''');
+
+  await db.execute('''
+    CREATE TABLE IF NOT EXISTS cards(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      card_name TEXT NOT NULL,
+      suit TEXT NOT NULL,
+      image_url TEXT,
+      folder_id INTEGER,
+      FOREIGN KEY (folder_id) REFERENCES folders (id)
+      ON DELETE CASCADE
+    )
+  ''');
+
+  // ---- v1 -> v2 example: add a column, but only if missing
+  if (oldVersion < 2) {
+    final cols = await db.rawQuery("PRAGMA table_info(cards)");
+    final hasNotes = cols.any((c) => c['name'] == 'notes');
+    if (!hasNotes) {
+      await db.execute("ALTER TABLE cards ADD COLUMN notes TEXT DEFAULT ''");
+    }
+  }
+
+  // ---- Seed missing data (only if empty)
+  final folderCount = Sqflite.firstIntValue(
+        await db.rawQuery('SELECT COUNT(*) FROM folders'),
+      ) ??
+      0;
+
+  if (folderCount == 0) {
+    await _prepopulateFolders(db);
+  }
+
+  final cardCount =
+      Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM cards')) ??
+          0;
+
+  if (cardCount == 0) {
+    await _prepopulateCards(db);
+  }
+}
 
   Future _prepopulateFolders(Database db) async {
     final folders = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
