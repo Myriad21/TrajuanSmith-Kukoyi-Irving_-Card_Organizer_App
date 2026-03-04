@@ -19,7 +19,7 @@ class DatabaseHelper {
 
     return await openDatabase(
   path,
-  version: 2,
+  version: 3,
   onCreate: _createDB,
   onUpgrade: _upgradeDB,
 );
@@ -84,6 +84,21 @@ Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (!hasNotes) {
       await db.execute("ALTER TABLE cards ADD COLUMN notes TEXT DEFAULT ''");
     }
+  }
+
+  // ---- v2 -> v3 fix image paths
+  if (oldVersion < 3) {
+    await db.execute('''
+      UPDATE cards
+      SET image_url =
+        'assets/cards/' || lower(suit) || '_' ||
+        (CASE
+          WHEN card_name IN ('Jack','Queen','King','Ace')
+          THEN upper(substr(card_name,1,1)) || lower(substr(card_name,2))
+          ELSE card_name
+        END)
+        || '.png'
+    ''');
   }
 
   // ---- Seed missing data (only if empty)
