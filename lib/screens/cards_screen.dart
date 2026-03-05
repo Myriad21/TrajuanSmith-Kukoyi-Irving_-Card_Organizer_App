@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/folder.dart';
 import '../models/card.dart';
 import '../repositories/card_repository.dart';
+import 'add_edit_card_screen.dart';
 
 
 class CardsScreen extends StatefulWidget {
@@ -90,8 +91,17 @@ class _CardsScreenState extends State<CardsScreen> {
 
                       IconButton(
                         icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          // nothing for now
+                        onPressed: () async {
+                          final changed = await Navigator.push<bool>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AddEditCardScreen(
+                                folder: widget.folder,
+                                existingCard: card,
+                              ),
+                            ),
+                          );
+                          if (changed == true) _loadCards();
                         },
                       ),
 
@@ -106,6 +116,18 @@ class _CardsScreenState extends State<CardsScreen> {
                 );
               },
             ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final changed = await Navigator.push<bool>(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AddEditCardScreen(folder: widget.folder),
+            ),
+          );
+          if (changed == true) _loadCards();
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
